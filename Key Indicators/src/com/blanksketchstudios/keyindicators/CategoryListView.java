@@ -1,7 +1,6 @@
 package com.blanksketchstudios.keyindicators;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 
 import com.blanksketchstudios.keyindicators.Model.DataMaster;
 import com.blanksketchstudios.keyindicators.Model.Indicator;
-import com.blanksketchstudios.keyindicators.Model.SaveIndicatorTask;
 
 public class CategoryListView extends FragmentActivity implements ActionBar.OnNavigationListener {
 
