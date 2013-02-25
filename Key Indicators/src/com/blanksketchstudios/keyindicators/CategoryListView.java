@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,11 +14,14 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blanksketchstudios.keyindicators.Model.DataMaster;
 import com.blanksketchstudios.keyindicators.Model.Indicator;
@@ -82,6 +87,32 @@ public class CategoryListView extends FragmentActivity implements ActionBar.OnNa
     	Log.d(KIGlobals.LogTag, "in TestSave");
     	Indicator newIndicator = dataMaster.createNewIndicator("None");
     	newIndicator.save(this);
+    }
+    /**
+     * This method is called when the user taps the Add Category button at the top of the screen
+     * @param view
+     */
+    public boolean addCategory(MenuItem menuItem){
+    	Log.d(KIGlobals.LogTag, "in addCategory");
+    	//Let's open a "category name dialogue"
+    	final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final EditText input = new EditText(this);
+        input.setHint("New category name");
+        alert.setView(input);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = input.getText().toString().trim();
+                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+            }
+        });
+        alert.show();
+        return true;
     }
     /**
      * Backward-compatible version of {@link ActionBar#getThemedContext()} that
