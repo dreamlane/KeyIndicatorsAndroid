@@ -58,27 +58,7 @@ public class CategoryListView extends FragmentActivity implements ActionBar.OnNa
                                 getString(R.string.title_section3),
                         }),
                 this);
-        //Get a handle on the DataMaster
-        try {
-        dataMaster = DataMaster.getDataMasterInstance(this);
-        Log.d(KIGlobals.LogTag,"Got this far");
-        } catch(IOException e){
-        	//fail gracefully
-        	Log.e(KIGlobals.LogTag,"Caught IOException in CategoryListView onCreate");
-        }
-        //Let's make sure we've actually got an indicator created, if not show a tutorial image
-        if (dataMaster.getNumberOfIndicators() == 0){
-        	//Display the tutorial image, and skip everything else by returning from this method
-        	/*TODO: Display tutorial image here */
-        	Log.d(KIGlobals.LogTag,"No indicators");
-        	return;
-        }
-        Log.d(KIGlobals.LogTag,"Got this far");
-        //Populate the Category list view with each category
-        ListView categoryListView = (ListView)findViewById(R.id.categoryListView);
-        ArrayAdapter<String> categoryListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, dataMaster.getCategories());
-        categoryListView.setAdapter(categoryListViewAdapter);
-        Log.d(KIGlobals.LogTag,"Got this far");
+        loadPageData();
     }
     /**
      * The button callback
@@ -92,7 +72,7 @@ public class CategoryListView extends FragmentActivity implements ActionBar.OnNa
      * This method is called when the user taps the Add Category button at the top of the screen
      * @param view
      */
-    public boolean addCategory(MenuItem menuItem){
+    public boolean addCategoryActionCallback(MenuItem menuItem){
     	Log.d(KIGlobals.LogTag, "in addCategory");
     	//Let's open a "category name dialogue"
     	final AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -102,7 +82,13 @@ public class CategoryListView extends FragmentActivity implements ActionBar.OnNa
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String value = input.getText().toString().trim();
-                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+                if (value.equals("")){
+                	Toast.makeText(getApplicationContext(), "No name given, operation aborted", Toast.LENGTH_SHORT).show();
+                }
+                else{
+	                createNewCategory(value);
+	                Toast.makeText(getApplicationContext(), "Created new category: "+value, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -113,6 +99,41 @@ public class CategoryListView extends FragmentActivity implements ActionBar.OnNa
         });
         alert.show();
         return true;
+    }
+    /**
+     * This method is called when the user taps "OK" on the add category dialogue
+     * @param categoryName : The name of the new category being created, if this category is blank, then no category is created
+     */
+    private void createNewCategory(String categoryName){
+    	//A new category is created by creating a new indicator with the new category set as its category
+    	//Note that it doesn't make sense to create an empty category, so this works nicely
+    	if (!categoryName.equals("")){
+			Indicator newIndicator = dataMaster.createNewIndicator(categoryName);
+			newIndicator.save(this);
+			//reload the page
+			loadPageData(); //Do we need to consider the amount of time that this might take?
+    	}
+    }
+    
+    private void loadPageData(){
+    	//Get a handle on the DataMaster
+        try {
+        dataMaster = DataMaster.getDataMasterInstance(this);
+        } catch(IOException e){
+        	//fail gracefully
+        	Log.e(KIGlobals.LogTag,"Caught IOException in CategoryListView onCreate");
+        }
+        //Let's make sure we've actually got an indicator created, if not show a tutorial image
+        if (dataMaster.getNumberOfIndicators() == 0){
+        	//Display the tutorial image, and skip everything else by returning from this method
+        	/*TODO: Display tutorial image here */
+        	Log.d(KIGlobals.LogTag,"No indicators");
+        	return;
+        }
+        //Populate the Category list view with each category
+        ListView categoryListView = (ListView)findViewById(R.id.categoryListView);
+        ArrayAdapter<String> categoryListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, dataMaster.getCategories());
+        categoryListView.setAdapter(categoryListViewAdapter);
     }
     /**
      * Backward-compatible version of {@link ActionBar#getThemedContext()} that

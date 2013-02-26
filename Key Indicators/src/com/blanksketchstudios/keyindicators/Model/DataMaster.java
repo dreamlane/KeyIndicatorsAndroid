@@ -26,6 +26,7 @@ import com.blanksketchstudios.keyindicators.KIGlobals;
 
 public class DataMaster {
 	private static DataMaster dataMasterInstance = null; //this is essential to our singleton pattern
+	private boolean needsRefresh = true;
 	private HashMap<Integer,Indicator> indicators; //{indicatorID:indicator}
 	private ArrayList<String> categories;
 	private Context context;
@@ -36,7 +37,7 @@ public class DataMaster {
 		
 		//The context of the single instance should be set at this point, and changed whenever the getDataMasterInstance is called?
 		this.context = ctx;
-		
+		this.needsRefresh = false;
 		//When the instance is first created, it needs to load all of the indicators from file.
 		
 		//The list of indicators is kept in a file called idList.dat
@@ -63,7 +64,9 @@ public class DataMaster {
 		 HashMap<String,Integer[]> weeks = new HashMap<String,Integer[]>(); //Here the String is mm/dd/yyyy (first of the week)
 		 HashMap<String,Integer[]> months = new HashMap<String,Integer[]>(); //Here the String is mm/yyyy (the month)
 		 int allTimeTotal;
-		for (Integer id : IDs){
+		 
+		 //For each indicator, load it into memory from file.
+		 for (Integer id : IDs){
 			//open the file
 			Log.d(KIGlobals.LogTag,String.format("Reading data for indicator: %d",id));
 			filename = ""+id+".dat";
@@ -124,7 +127,9 @@ public class DataMaster {
 	 *    a progressHUD.
 	 */
 	public static DataMaster getDataMasterInstance(Context ctx)throws IOException{
-		if (dataMasterInstance==null){
+		//If we haven't yet made the singleton instance, make it
+		//Also, if the data has changed, reload it (time consideration?)
+		if (dataMasterInstance==null || dataMasterInstance.needsRefresh()){
 			dataMasterInstance = new DataMaster(ctx);
 		}
 		dataMasterInstance.context = ctx;
@@ -185,6 +190,11 @@ public class DataMaster {
 			return null;
 		}
 	}
+	/* setters */
+	
+	public void setNeedsRefresh(boolean needsRefresh){
+		this.needsRefresh = needsRefresh;
+	}
 	/* getters */
 	public HashMap<Integer,Indicator> getIndicators(){
 		return indicators;
@@ -194,5 +204,8 @@ public class DataMaster {
 	}
 	public int getNumberOfIndicators(){
 		return numberOfIndicators;
+	}
+	public boolean needsRefresh(){
+		return this.needsRefresh;
 	}
 }

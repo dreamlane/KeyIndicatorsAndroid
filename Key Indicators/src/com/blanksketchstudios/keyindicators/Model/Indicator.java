@@ -40,6 +40,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.blanksketchstudios.keyindicators.KIGlobals;
+import com.blanksketchstudios.keyindicators.Model.*;
 
 public class Indicator {
 	private int indicatorID;
@@ -145,11 +146,15 @@ public class Indicator {
 		fos.write(outString.toString().getBytes());
 		fos.close();
 		
+		//Set the data master to refresh
+		DataMaster dm = DataMaster.getDataMasterInstance(ctx);
+		dm.setNeedsRefresh(true);
 		}catch(Exception e){
 			//fail gracefully
 			Log.d(KIGlobals.LogTag,"FAILED");
 			return false;
 		}
+		
 		return true;
 		
 	}

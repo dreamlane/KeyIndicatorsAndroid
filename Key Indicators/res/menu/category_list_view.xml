@@ -9,7 +9,7 @@
         android:id="@+id/add_category" 
         android:title="Add Category"
         android:icon="@drawable/ic_menu_item_add_category"
-        android:onClick="addCategory"
+        android:onClick="addCategoryActionCallback"
         android:showAsAction="ifRoom|withText" 
         android:enabled="true" 
         android:visible="true">
